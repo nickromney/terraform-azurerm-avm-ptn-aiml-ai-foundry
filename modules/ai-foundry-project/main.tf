@@ -37,7 +37,7 @@ locals {
   )
   storage_use_project_identity = coalesce(
     var.storage_account_use_project_identity,
-    var.storage_account_auth_type == "ManagedIdentity"
+    contains(["ManagedIdentity", "ProjectManagedIdentity"], var.storage_account_auth_type)
   )
   cosmos_use_project_identity = coalesce(
     var.cosmos_db_use_project_identity,

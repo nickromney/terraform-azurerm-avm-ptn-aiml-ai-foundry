@@ -137,19 +137,19 @@ variable "storage_account_location" {
 
 variable "storage_account_auth_type" {
   type        = string
-  default     = "ManagedIdentity"
+  default     = "ProjectManagedIdentity"
   description = "Authentication type for the Storage Account project connection."
 
   validation {
-    condition     = contains(["AAD", "ApiKey", "ManagedIdentity"], var.storage_account_auth_type)
-    error_message = "storage_account_auth_type must be one of: AAD, ApiKey, ManagedIdentity."
+    condition     = contains(["AAD", "AccountKey", "ProjectManagedIdentity", "AccountManagedIdentity", "ManagedIdentity", "UserEntraToken", "AgentUserImpersonation", "AgenticIdentityToken", "AgenticUser"], var.storage_account_auth_type)
+    error_message = "storage_account_auth_type must be one of: AAD, AccountKey, ProjectManagedIdentity, AccountManagedIdentity, ManagedIdentity, UserEntraToken, AgentUserImpersonation, AgenticIdentityToken, AgenticUser."
   }
 }
 
 variable "storage_account_use_project_identity" {
   type        = bool
   default     = null
-  description = "Whether the Storage Account project connection uses the project/workspace managed identity. Defaults to true when auth_type is ManagedIdentity."
+  description = "Whether the Storage Account project connection uses the project/workspace managed identity. Defaults to true when auth_type is a project managed identity mode."
 }
 
 variable "create_storage_account_connection" {

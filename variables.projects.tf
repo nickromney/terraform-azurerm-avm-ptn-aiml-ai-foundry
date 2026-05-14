@@ -32,7 +32,7 @@ variable "ai_projects" {
       new_resource_map_key           = optional(string, null)
       location                       = optional(string, null)
       enabled                        = optional(bool, false)
-      auth_type                      = optional(string, "ManagedIdentity")
+      auth_type                      = optional(string, "ProjectManagedIdentity")
       use_workspace_managed_identity = optional(bool, null)
     }), {})
   }))
@@ -51,8 +51,8 @@ Configuration map for AI Foundry projects to be created. Each project can have i
     - `new_resource_map_key` - (Optional) The map key of a new Cosmos DB account to be created and connected.
     - `location` - (Optional) The Azure region of the Cosmos DB account. Defaults to the project location.
     - `enabled` - (Optional) Whether to create the Cosmos DB project connection and RBAC. Default is false.
-    - `auth_type` - (Optional) Authentication type for the project connection. Default is "ManagedIdentity".
-    - `use_workspace_managed_identity` - (Optional) Whether the connection uses the project/workspace managed identity. Defaults to true when auth_type is "ManagedIdentity".
+    - `auth_type` - (Optional) Authentication type for the project connection. Default is "ProjectManagedIdentity".
+    - `use_workspace_managed_identity` - (Optional) Whether the connection uses the project/workspace managed identity. Defaults to true when auth_type is a project managed identity mode.
   - `ai_search_connection` - (Optional) Configuration for AI Search connection.
     - `existing_resource_id` - (Optional) The resource ID of an existing AI Search service to connect to.
     - `new_resource_map_key` - (Optional) The map key of a new AI Search service to be created and connected.

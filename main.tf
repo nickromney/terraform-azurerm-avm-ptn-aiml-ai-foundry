@@ -35,7 +35,7 @@ module "ai_foundry_project" {
   create_project_connections           = each.value.create_project_connections
   storage_account_id                   = try(coalesce(each.value.storage_account_connection.existing_resource_id, try(module.storage_account[each.value.storage_account_connection.new_resource_map_key].resource_id, null)), null)
   storage_account_location             = try(each.value.storage_account_connection.location, var.location)
-  storage_account_auth_type            = try(each.value.storage_account_connection.auth_type, "ManagedIdentity")
+  storage_account_auth_type            = try(each.value.storage_account_connection.auth_type, "ProjectManagedIdentity")
   storage_account_use_project_identity = try(each.value.storage_account_connection.use_workspace_managed_identity, null)
   create_storage_account_connection    = try(each.value.storage_account_connection.enabled, false)
   tags                                 = var.tags
