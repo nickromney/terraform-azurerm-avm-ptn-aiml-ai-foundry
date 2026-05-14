@@ -47,6 +47,23 @@ variable "ai_search_location" {
   description = "Azure region of the AI Search service. Defaults to the project location."
 }
 
+variable "ai_search_auth_type" {
+  type        = string
+  default     = "ManagedIdentity"
+  description = "Authentication type for the AI Search project connection."
+
+  validation {
+    condition     = contains(["AAD", "ApiKey", "ManagedIdentity"], var.ai_search_auth_type)
+    error_message = "ai_search_auth_type must be one of: AAD, ApiKey, ManagedIdentity."
+  }
+}
+
+variable "ai_search_use_project_identity" {
+  type        = bool
+  default     = null
+  description = "Whether the AI Search project connection uses the project/workspace managed identity. Defaults to true when auth_type is ManagedIdentity."
+}
+
 variable "create_ai_search_connection" {
   type        = bool
   default     = false
@@ -63,6 +80,23 @@ variable "cosmos_db_location" {
   type        = string
   default     = null
   description = "Azure region of the Cosmos DB account. Defaults to the project location."
+}
+
+variable "cosmos_db_auth_type" {
+  type        = string
+  default     = "ManagedIdentity"
+  description = "Authentication type for the Cosmos DB project connection."
+
+  validation {
+    condition     = contains(["AAD", "ApiKey", "ManagedIdentity"], var.cosmos_db_auth_type)
+    error_message = "cosmos_db_auth_type must be one of: AAD, ApiKey, ManagedIdentity."
+  }
+}
+
+variable "cosmos_db_use_project_identity" {
+  type        = bool
+  default     = null
+  description = "Whether the Cosmos DB project connection uses the project/workspace managed identity. Defaults to true when auth_type is ManagedIdentity."
 }
 
 variable "create_cosmos_db_connection" {
@@ -99,6 +133,23 @@ variable "storage_account_location" {
   type        = string
   default     = null
   description = "Azure region of the Storage Account. Defaults to the project location."
+}
+
+variable "storage_account_auth_type" {
+  type        = string
+  default     = "ManagedIdentity"
+  description = "Authentication type for the Storage Account project connection."
+
+  validation {
+    condition     = contains(["AAD", "ApiKey", "ManagedIdentity"], var.storage_account_auth_type)
+    error_message = "storage_account_auth_type must be one of: AAD, ApiKey, ManagedIdentity."
+  }
+}
+
+variable "storage_account_use_project_identity" {
+  type        = bool
+  default     = null
+  description = "Whether the Storage Account project connection uses the project/workspace managed identity. Defaults to true when auth_type is ManagedIdentity."
 }
 
 variable "create_storage_account_connection" {

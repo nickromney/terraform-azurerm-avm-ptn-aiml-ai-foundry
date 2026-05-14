@@ -6,16 +6,20 @@ variable "ai_projects" {
     description                = string
     create_project_connections = optional(bool, false)
     cosmos_db_connection = optional(object({
-      existing_resource_id = optional(string, null)
-      new_resource_map_key = optional(string, null)
-      location             = optional(string, null)
-      enabled              = optional(bool, false)
+      existing_resource_id           = optional(string, null)
+      new_resource_map_key           = optional(string, null)
+      location                       = optional(string, null)
+      enabled                        = optional(bool, false)
+      auth_type                      = optional(string, "ManagedIdentity")
+      use_workspace_managed_identity = optional(bool, null)
     }), {})
     ai_search_connection = optional(object({
-      existing_resource_id = optional(string, null)
-      new_resource_map_key = optional(string, null)
-      location             = optional(string, null)
-      enabled              = optional(bool, false)
+      existing_resource_id           = optional(string, null)
+      new_resource_map_key           = optional(string, null)
+      location                       = optional(string, null)
+      enabled                        = optional(bool, false)
+      auth_type                      = optional(string, "ManagedIdentity")
+      use_workspace_managed_identity = optional(bool, null)
     }), {})
     key_vault_connection = optional(object({
       existing_resource_id = optional(string, null)
@@ -24,10 +28,12 @@ variable "ai_projects" {
       enabled              = optional(bool, false)
     }), {})
     storage_account_connection = optional(object({
-      existing_resource_id = optional(string, null)
-      new_resource_map_key = optional(string, null)
-      location             = optional(string, null)
-      enabled              = optional(bool, false)
+      existing_resource_id           = optional(string, null)
+      new_resource_map_key           = optional(string, null)
+      location                       = optional(string, null)
+      enabled                        = optional(bool, false)
+      auth_type                      = optional(string, "ManagedIdentity")
+      use_workspace_managed_identity = optional(bool, null)
     }), {})
   }))
   default     = {}
@@ -45,11 +51,15 @@ Configuration map for AI Foundry projects to be created. Each project can have i
     - `new_resource_map_key` - (Optional) The map key of a new Cosmos DB account to be created and connected.
     - `location` - (Optional) The Azure region of the Cosmos DB account. Defaults to the project location.
     - `enabled` - (Optional) Whether to create the Cosmos DB project connection and RBAC. Default is false.
+    - `auth_type` - (Optional) Authentication type for the project connection. Default is "ManagedIdentity".
+    - `use_workspace_managed_identity` - (Optional) Whether the connection uses the project/workspace managed identity. Defaults to true when auth_type is "ManagedIdentity".
   - `ai_search_connection` - (Optional) Configuration for AI Search connection.
     - `existing_resource_id` - (Optional) The resource ID of an existing AI Search service to connect to.
     - `new_resource_map_key` - (Optional) The map key of a new AI Search service to be created and connected.
     - `location` - (Optional) The Azure region of the AI Search service. Defaults to the project location.
     - `enabled` - (Optional) Whether to create the AI Search project connection and RBAC. Default is false.
+    - `auth_type` - (Optional) Authentication type for the project connection. Default is "ManagedIdentity".
+    - `use_workspace_managed_identity` - (Optional) Whether the connection uses the project/workspace managed identity. Defaults to true when auth_type is "ManagedIdentity".
   - `key_vault_connection` - (Optional) Configuration for Key Vault connection.
     - `existing_resource_id` - (Optional) The resource ID of an existing Key Vault to connect to.
     - `new_resource_map_key` - (Optional) The map key of a new Key Vault to be created and connected.
@@ -60,5 +70,7 @@ Configuration map for AI Foundry projects to be created. Each project can have i
     - `new_resource_map_key` - (Optional) The map key of a new Storage Account to be created and connected.
     - `location` - (Optional) The Azure region of the Storage Account. Defaults to the project location.
     - `enabled` - (Optional) Whether to create the Storage Account project connection and RBAC. Default is false.
+    - `auth_type` - (Optional) Authentication type for the project connection. Default is "ManagedIdentity".
+    - `use_workspace_managed_identity` - (Optional) Whether the connection uses the project/workspace managed identity. Defaults to true when auth_type is "ManagedIdentity".
 DESCRIPTION
 }

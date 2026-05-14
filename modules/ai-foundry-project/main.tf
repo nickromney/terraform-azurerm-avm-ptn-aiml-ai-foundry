@@ -30,6 +30,18 @@ locals {
   create_cosmos_connection  = var.create_project_connections && var.create_cosmos_db_connection
   create_search_connection  = var.create_project_connections && var.create_ai_search_connection
   create_any_connection     = local.create_storage_connection || local.create_cosmos_connection || local.create_search_connection
+  storage_use_project_identity = coalesce(
+    var.storage_account_use_project_identity,
+    var.storage_account_auth_type == "ManagedIdentity"
+  )
+  cosmos_use_project_identity = coalesce(
+    var.cosmos_db_use_project_identity,
+    var.cosmos_db_auth_type == "ManagedIdentity"
+  )
+  search_use_project_identity = coalesce(
+    var.ai_search_use_project_identity,
+    var.ai_search_auth_type == "ManagedIdentity"
+  )
 }
 
 resource "time_sleep" "wait_project_identities" {
@@ -46,9 +58,10 @@ resource "azapi_resource" "connection_storage" {
   type      = "Microsoft.CognitiveServices/accounts/projects/connections@2025-04-01-preview"
   body = {
     properties = {
-      category = "AzureStorageAccount"
-      target   = "https://${basename(var.storage_account_id)}.blob.core.windows.net/"
-      authType = "AAD"
+      category                    = "AzureStorageAccount"
+      target                      = "https://${basename(var.storage_account_id)}.blob.core.windows.net/"
+      authType                    = var.storage_account_auth_type
+      useWorkspaceManagedIdentity = local.storage_use_project_identity
       metadata = {
         ApiType    = "Azure"
         ResourceId = var.storage_account_id
@@ -72,9 +85,10 @@ resource "azapi_resource" "connection_cosmos" {
   type      = "Microsoft.CognitiveServices/accounts/projects/connections@2025-04-01-preview"
   body = {
     properties = {
-      category = "CosmosDb"
-      target   = "https://${basename(var.cosmos_db_id)}.documents.azure.com:443/"
-      authType = "AAD"
+      category                    = "CosmosDb"
+      target                      = "https://${basename(var.cosmos_db_id)}.documents.azure.com:443/"
+      authType                    = var.cosmos_db_auth_type
+      useWorkspaceManagedIdentity = local.cosmos_use_project_identity
       metadata = {
         ApiType    = "Azure"
         ResourceId = var.cosmos_db_id
@@ -98,9 +112,10 @@ resource "azapi_resource" "connection_search" {
   type      = "Microsoft.CognitiveServices/accounts/projects/connections@2025-04-01-preview"
   body = {
     properties = {
-      category = "CognitiveSearch"
-      target   = "https://${basename(var.ai_search_id)}.search.windows.net"
-      authType = "AAD"
+      category                    = "CognitiveSearch"
+      target                      = "https://${basename(var.ai_search_id)}.search.windows.net"
+      authType                    = var.ai_search_auth_type
+      useWorkspaceManagedIdentity = local.search_use_project_identity
       metadata = {
         ApiType    = "Azure"
         ApiVersion = "2024-05-01-preview"
