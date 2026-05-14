@@ -41,10 +41,22 @@ variable "ai_search_id" {
   description = "Resource ID of the AI Search service"
 }
 
+variable "ai_search_location" {
+  type        = string
+  default     = null
+  description = "Azure region of the AI Search service. Defaults to the project location."
+}
+
 variable "cosmos_db_id" {
   type        = string
   default     = null
   description = "Resource ID of the Cosmos DB account"
+}
+
+variable "cosmos_db_location" {
+  type        = string
+  default     = null
+  description = "Azure region of the Cosmos DB account. Defaults to the project location."
 }
 
 variable "create_ai_agent_service" {
@@ -69,6 +81,12 @@ variable "storage_account_id" {
   type        = string
   default     = null
   description = "Resource ID of the Storage Account"
+}
+
+variable "storage_account_location" {
+  type        = string
+  default     = null
+  description = "Azure region of the Storage Account. Defaults to the project location."
 }
 
 variable "tags" {

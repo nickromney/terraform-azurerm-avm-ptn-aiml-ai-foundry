@@ -25,7 +25,11 @@ resource "azapi_resource" "ai_foundry_project" {
 
 locals {
   # Extract project internal ID and format as GUID for container naming
-  project_id_guid = var.create_ai_agent_service ? "${substr(azapi_resource.ai_foundry_project.output.properties.internalId, 0, 8)}-${substr(azapi_resource.ai_foundry_project.output.properties.internalId, 8, 4)}-${substr(azapi_resource.ai_foundry_project.output.properties.internalId, 12, 4)}-${substr(azapi_resource.ai_foundry_project.output.properties.internalId, 16, 4)}-${substr(azapi_resource.ai_foundry_project.output.properties.internalId, 20, 12)}" : ""
+  project_id_guid           = var.create_ai_agent_service ? "${substr(azapi_resource.ai_foundry_project.output.properties.internalId, 0, 8)}-${substr(azapi_resource.ai_foundry_project.output.properties.internalId, 8, 4)}-${substr(azapi_resource.ai_foundry_project.output.properties.internalId, 12, 4)}-${substr(azapi_resource.ai_foundry_project.output.properties.internalId, 16, 4)}-${substr(azapi_resource.ai_foundry_project.output.properties.internalId, 20, 12)}" : ""
+  create_storage_connection = var.create_project_connections && var.storage_account_id != null
+  create_cosmos_connection  = var.create_project_connections && var.cosmos_db_id != null
+  create_search_connection  = var.create_project_connections && var.ai_search_id != null
+  create_any_connection     = local.create_storage_connection || local.create_cosmos_connection || local.create_search_connection
 }
 
 resource "time_sleep" "wait_project_identities" {
@@ -35,20 +39,20 @@ resource "time_sleep" "wait_project_identities" {
 }
 
 resource "azapi_resource" "connection_storage" {
-  count = var.create_project_connections ? 1 : 0
+  count = local.create_storage_connection ? 1 : 0
 
-  name      = basename(var.create_project_connections ? var.storage_account_id : "/n/o/t/u/s/e/d")
+  name      = basename(var.storage_account_id)
   parent_id = azapi_resource.ai_foundry_project.id
   type      = "Microsoft.CognitiveServices/accounts/projects/connections@2025-04-01-preview"
   body = {
     properties = {
       category = "AzureStorageAccount"
-      target   = "https://${basename(var.create_project_connections ? var.storage_account_id : "/n/o/t/u/s/e/d")}.blob.core.windows.net/"
+      target   = "https://${basename(var.storage_account_id)}.blob.core.windows.net/"
       authType = "AAD"
       metadata = {
         ApiType    = "Azure"
         ResourceId = var.storage_account_id
-        location   = var.location
+        location   = coalesce(var.storage_account_location, var.location)
       }
     }
   }
@@ -61,20 +65,20 @@ resource "azapi_resource" "connection_storage" {
 }
 
 resource "azapi_resource" "connection_cosmos" {
-  count = var.create_project_connections ? 1 : 0
+  count = local.create_cosmos_connection ? 1 : 0
 
-  name      = basename(var.create_project_connections ? var.cosmos_db_id : "/n/o/t/u/s/e/d")
+  name      = basename(var.cosmos_db_id)
   parent_id = azapi_resource.ai_foundry_project.id
   type      = "Microsoft.CognitiveServices/accounts/projects/connections@2025-04-01-preview"
   body = {
     properties = {
       category = "CosmosDb"
-      target   = "https://${basename(var.create_project_connections ? var.cosmos_db_id : "/n/o/t/u/s/e/d")}.documents.azure.com:443/"
+      target   = "https://${basename(var.cosmos_db_id)}.documents.azure.com:443/"
       authType = "AAD"
       metadata = {
         ApiType    = "Azure"
         ResourceId = var.cosmos_db_id
-        location   = var.location
+        location   = coalesce(var.cosmos_db_location, var.location)
       }
     }
   }
@@ -87,21 +91,21 @@ resource "azapi_resource" "connection_cosmos" {
 }
 
 resource "azapi_resource" "connection_search" {
-  count = var.create_project_connections ? 1 : 0
+  count = local.create_search_connection ? 1 : 0
 
-  name      = basename(var.create_project_connections ? var.ai_search_id : "/n/o/t/u/s/e/d")
+  name      = basename(var.ai_search_id)
   parent_id = azapi_resource.ai_foundry_project.id
   type      = "Microsoft.CognitiveServices/accounts/projects/connections@2025-04-01-preview"
   body = {
     properties = {
       category = "CognitiveSearch"
-      target   = "https://${basename(var.create_project_connections ? var.ai_search_id : "/n/o/t/u/s/e/d")}.search.windows.net"
+      target   = "https://${basename(var.ai_search_id)}.search.windows.net"
       authType = "AAD"
       metadata = {
         ApiType    = "Azure"
         ApiVersion = "2024-05-01-preview"
         ResourceId = var.ai_search_id
-        location   = var.location
+        location   = coalesce(var.ai_search_location, var.location)
       }
     }
   }
@@ -118,7 +122,7 @@ resource "azapi_resource" "connection_search" {
 
 #TODO: do we need to add support for Key Vault connections?
 resource "azapi_resource" "ai_agent_capability_host" {
-  count = var.create_ai_agent_service && var.create_project_connections ? 1 : 0
+  count = var.create_ai_agent_service && local.create_any_connection ? 1 : 0
 
   name      = var.ai_agent_host_name
   parent_id = azapi_resource.ai_foundry_project.id
@@ -126,13 +130,13 @@ resource "azapi_resource" "ai_agent_capability_host" {
   body = {
     properties = {
       capabilityHostKind = "Agents"
-      vectorStoreConnections = var.ai_search_id != null ? [
+      vectorStoreConnections = local.create_search_connection ? [
         azapi_resource.connection_search[0].name
       ] : []
-      storageConnections = var.storage_account_id != null ? [
+      storageConnections = local.create_storage_connection ? [
         azapi_resource.connection_storage[0].name
       ] : []
-      threadStorageConnections = var.cosmos_db_id != null ? [
+      threadStorageConnections = local.create_cosmos_connection ? [
         azapi_resource.connection_cosmos[0].name
       ] : []
     }
@@ -162,4 +166,3 @@ resource "time_sleep" "wait_rbac_before_capability_host" {
     time_sleep.wait_project_identities
   ]
 }
-
