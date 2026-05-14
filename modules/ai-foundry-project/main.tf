@@ -30,6 +30,11 @@ locals {
   create_cosmos_connection  = var.create_project_connections && var.create_cosmos_db_connection
   create_search_connection  = var.create_project_connections && var.create_ai_search_connection
   create_any_connection     = local.create_storage_connection || local.create_cosmos_connection || local.create_search_connection
+  create_managed_identity_connection = (
+    (local.create_storage_connection && var.storage_account_auth_type == "ManagedIdentity") ||
+    (local.create_cosmos_connection && var.cosmos_db_auth_type == "ManagedIdentity") ||
+    (local.create_search_connection && var.ai_search_auth_type == "ManagedIdentity")
+  )
   storage_use_project_identity = coalesce(
     var.storage_account_use_project_identity,
     var.storage_account_auth_type == "ManagedIdentity"
@@ -42,6 +47,18 @@ locals {
     var.ai_search_use_project_identity,
     var.ai_search_auth_type == "ManagedIdentity"
   )
+  project_managed_identity_credentials = local.create_managed_identity_connection ? {
+    clientId   = data.azuread_service_principal.project_identity[0].client_id
+    resourceId = azapi_resource.ai_foundry_project.id
+  } : null
+}
+
+data "azuread_service_principal" "project_identity" {
+  count = local.create_managed_identity_connection ? 1 : 0
+
+  object_id = azapi_resource.ai_foundry_project.output.identity.principalId
+
+  depends_on = [time_sleep.wait_project_identities]
 }
 
 resource "time_sleep" "wait_project_identities" {
@@ -57,7 +74,7 @@ resource "azapi_resource" "connection_storage" {
   parent_id = azapi_resource.ai_foundry_project.id
   type      = "Microsoft.CognitiveServices/accounts/projects/connections@2025-04-01-preview"
   body = {
-    properties = {
+    properties = merge({
       category                    = "AzureStorageAccount"
       target                      = "https://${basename(var.storage_account_id)}.blob.core.windows.net/"
       authType                    = var.storage_account_auth_type
@@ -67,7 +84,9 @@ resource "azapi_resource" "connection_storage" {
         ResourceId = var.storage_account_id
         location   = coalesce(var.storage_account_location, var.location)
       }
-    }
+      },
+      var.storage_account_auth_type == "ManagedIdentity" ? { credentials = local.project_managed_identity_credentials } : {}
+    )
   }
   response_export_values = [
     "identity.principalId"
@@ -84,7 +103,7 @@ resource "azapi_resource" "connection_cosmos" {
   parent_id = azapi_resource.ai_foundry_project.id
   type      = "Microsoft.CognitiveServices/accounts/projects/connections@2025-04-01-preview"
   body = {
-    properties = {
+    properties = merge({
       category                    = "CosmosDb"
       target                      = "https://${basename(var.cosmos_db_id)}.documents.azure.com:443/"
       authType                    = var.cosmos_db_auth_type
@@ -94,7 +113,9 @@ resource "azapi_resource" "connection_cosmos" {
         ResourceId = var.cosmos_db_id
         location   = coalesce(var.cosmos_db_location, var.location)
       }
-    }
+      },
+      var.cosmos_db_auth_type == "ManagedIdentity" ? { credentials = local.project_managed_identity_credentials } : {}
+    )
   }
   response_export_values = [
     "identity.principalId"
@@ -111,7 +132,7 @@ resource "azapi_resource" "connection_search" {
   parent_id = azapi_resource.ai_foundry_project.id
   type      = "Microsoft.CognitiveServices/accounts/projects/connections@2025-04-01-preview"
   body = {
-    properties = {
+    properties = merge({
       category                    = "CognitiveSearch"
       target                      = "https://${basename(var.ai_search_id)}.search.windows.net"
       authType                    = var.ai_search_auth_type
@@ -122,7 +143,9 @@ resource "azapi_resource" "connection_search" {
         ResourceId = var.ai_search_id
         location   = coalesce(var.ai_search_location, var.location)
       }
-    }
+      },
+      var.ai_search_auth_type == "ManagedIdentity" ? { credentials = local.project_managed_identity_credentials } : {}
+    )
   }
   schema_validation_enabled = false
 
