@@ -47,6 +47,12 @@ variable "ai_search_location" {
   description = "Azure region of the AI Search service. Defaults to the project location."
 }
 
+variable "create_ai_search_connection" {
+  type        = bool
+  default     = false
+  description = "Whether to create a project connection and RBAC for the AI Search service."
+}
+
 variable "cosmos_db_id" {
   type        = string
   default     = null
@@ -57,6 +63,12 @@ variable "cosmos_db_location" {
   type        = string
   default     = null
   description = "Azure region of the Cosmos DB account. Defaults to the project location."
+}
+
+variable "create_cosmos_db_connection" {
+  type        = bool
+  default     = false
+  description = "Whether to create a project connection and RBAC for the Cosmos DB account."
 }
 
 variable "create_ai_agent_service" {
@@ -87,6 +99,12 @@ variable "storage_account_location" {
   type        = string
   default     = null
   description = "Azure region of the Storage Account. Defaults to the project location."
+}
+
+variable "create_storage_account_connection" {
+  type        = bool
+  default     = false
+  description = "Whether to create a project connection and RBAC for the Storage Account."
 }
 
 variable "tags" {

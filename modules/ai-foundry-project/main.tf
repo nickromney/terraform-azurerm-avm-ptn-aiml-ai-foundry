@@ -26,9 +26,9 @@ resource "azapi_resource" "ai_foundry_project" {
 locals {
   # Extract project internal ID and format as GUID for container naming
   project_id_guid           = var.create_ai_agent_service ? "${substr(azapi_resource.ai_foundry_project.output.properties.internalId, 0, 8)}-${substr(azapi_resource.ai_foundry_project.output.properties.internalId, 8, 4)}-${substr(azapi_resource.ai_foundry_project.output.properties.internalId, 12, 4)}-${substr(azapi_resource.ai_foundry_project.output.properties.internalId, 16, 4)}-${substr(azapi_resource.ai_foundry_project.output.properties.internalId, 20, 12)}" : ""
-  create_storage_connection = var.create_project_connections && var.storage_account_id != null
-  create_cosmos_connection  = var.create_project_connections && var.cosmos_db_id != null
-  create_search_connection  = var.create_project_connections && var.ai_search_id != null
+  create_storage_connection = var.create_project_connections && var.create_storage_account_connection
+  create_cosmos_connection  = var.create_project_connections && var.create_cosmos_db_connection
+  create_search_connection  = var.create_project_connections && var.create_ai_search_connection
   create_any_connection     = local.create_storage_connection || local.create_cosmos_connection || local.create_search_connection
 }
 

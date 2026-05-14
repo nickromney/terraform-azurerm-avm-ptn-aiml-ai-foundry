@@ -21,15 +21,18 @@ module "ai_foundry_project" {
   name                       = each.value.name
   account_capability_host_id = try(azapi_resource.ai_agent_capability_host[0].id, null)
   #ai_search_id               = try(coalesce(each.value.ai_search_connection.existing_resource_id, try(module.ai_search[each.value.ai_search_connection.new_resource_map_key].resource_id, null)), null)
-  ai_search_id               = try(coalesce(each.value.ai_search_connection.existing_resource_id, try(azapi_resource.ai_search[each.value.ai_search_connection.new_resource_map_key].id, null)), null)
-  ai_search_location         = try(each.value.ai_search_connection.location, var.location)
-  cosmos_db_id               = try(coalesce(each.value.cosmos_db_connection.existing_resource_id, try(module.cosmosdb[each.value.cosmos_db_connection.new_resource_map_key].resource_id, null)), null)
-  cosmos_db_location         = try(each.value.cosmos_db_connection.location, var.location)
-  create_ai_agent_service    = var.ai_foundry.create_ai_agent_service
-  create_project_connections = each.value.create_project_connections
-  storage_account_id         = try(coalesce(each.value.storage_account_connection.existing_resource_id, try(module.storage_account[each.value.storage_account_connection.new_resource_map_key].resource_id, null)), null)
-  storage_account_location   = try(each.value.storage_account_connection.location, var.location)
-  tags                       = var.tags
+  ai_search_id                      = try(coalesce(each.value.ai_search_connection.existing_resource_id, try(azapi_resource.ai_search[each.value.ai_search_connection.new_resource_map_key].id, null)), null)
+  ai_search_location                = try(each.value.ai_search_connection.location, var.location)
+  create_ai_search_connection       = try(each.value.ai_search_connection.enabled, false)
+  cosmos_db_id                      = try(coalesce(each.value.cosmos_db_connection.existing_resource_id, try(module.cosmosdb[each.value.cosmos_db_connection.new_resource_map_key].resource_id, null)), null)
+  cosmos_db_location                = try(each.value.cosmos_db_connection.location, var.location)
+  create_cosmos_db_connection       = try(each.value.cosmos_db_connection.enabled, false)
+  create_ai_agent_service           = var.ai_foundry.create_ai_agent_service
+  create_project_connections        = each.value.create_project_connections
+  storage_account_id                = try(coalesce(each.value.storage_account_connection.existing_resource_id, try(module.storage_account[each.value.storage_account_connection.new_resource_map_key].resource_id, null)), null)
+  storage_account_location          = try(each.value.storage_account_connection.location, var.location)
+  create_storage_account_connection = try(each.value.storage_account_connection.enabled, false)
+  tags                              = var.tags
 
   depends_on = [
     azapi_resource.ai_foundry,

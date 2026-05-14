@@ -9,21 +9,25 @@ variable "ai_projects" {
       existing_resource_id = optional(string, null)
       new_resource_map_key = optional(string, null)
       location             = optional(string, null)
+      enabled              = optional(bool, false)
     }), {})
     ai_search_connection = optional(object({
       existing_resource_id = optional(string, null)
       new_resource_map_key = optional(string, null)
       location             = optional(string, null)
+      enabled              = optional(bool, false)
     }), {})
     key_vault_connection = optional(object({
       existing_resource_id = optional(string, null)
       new_resource_map_key = optional(string, null)
       location             = optional(string, null)
+      enabled              = optional(bool, false)
     }), {})
     storage_account_connection = optional(object({
       existing_resource_id = optional(string, null)
       new_resource_map_key = optional(string, null)
       location             = optional(string, null)
+      enabled              = optional(bool, false)
     }), {})
   }))
   default     = {}
@@ -40,17 +44,21 @@ Configuration map for AI Foundry projects to be created. Each project can have i
     - `existing_resource_id` - (Optional) The resource ID of an existing Cosmos DB account to connect to.
     - `new_resource_map_key` - (Optional) The map key of a new Cosmos DB account to be created and connected.
     - `location` - (Optional) The Azure region of the Cosmos DB account. Defaults to the project location.
+    - `enabled` - (Optional) Whether to create the Cosmos DB project connection and RBAC. Default is false.
   - `ai_search_connection` - (Optional) Configuration for AI Search connection.
     - `existing_resource_id` - (Optional) The resource ID of an existing AI Search service to connect to.
     - `new_resource_map_key` - (Optional) The map key of a new AI Search service to be created and connected.
     - `location` - (Optional) The Azure region of the AI Search service. Defaults to the project location.
+    - `enabled` - (Optional) Whether to create the AI Search project connection and RBAC. Default is false.
   - `key_vault_connection` - (Optional) Configuration for Key Vault connection.
     - `existing_resource_id` - (Optional) The resource ID of an existing Key Vault to connect to.
     - `new_resource_map_key` - (Optional) The map key of a new Key Vault to be created and connected.
     - `location` - (Optional) The Azure region of the Key Vault. Defaults to the project location.
+    - `enabled` - (Optional) Reserved for a future Key Vault project connection. Default is false.
   - `storage_account_connection` - (Optional) Configuration for Storage Account connection.
     - `existing_resource_id` - (Optional) The resource ID of an existing Storage Account to connect to.
     - `new_resource_map_key` - (Optional) The map key of a new Storage Account to be created and connected.
     - `location` - (Optional) The Azure region of the Storage Account. Defaults to the project location.
+    - `enabled` - (Optional) Whether to create the Storage Account project connection and RBAC. Default is false.
 DESCRIPTION
 }
