@@ -174,7 +174,7 @@ resource "time_sleep" "ai_foundry_wait" {
 resource "azurerm_private_endpoint" "ai_foundry" {
   count = var.create_private_endpoints ? 1 : 0
 
-  location            = var.location
+  location            = coalesce(var.private_endpoint_location, var.location)
   name                = "pe-${azapi_resource.ai_foundry.name}"
   resource_group_name = basename(var.resource_group_resource_id)
   subnet_id           = var.private_endpoint_subnet_resource_id

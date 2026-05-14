@@ -130,6 +130,12 @@ variable "private_endpoint_subnet_resource_id" {
   description = "(Optional) The subnet ID for private endpoints."
 }
 
+variable "private_endpoint_location" {
+  type        = string
+  default     = null
+  description = "(Optional) Azure region for private endpoint resources. Defaults to the Foundry account location."
+}
+
 #TODO: Move the project relating naming to a separate projects map so we can create multiple projects in the same module. (Then separate the remaining names into individual variables?)
 variable "resource_names" {
   type = object({
